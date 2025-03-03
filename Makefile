@@ -1,8 +1,11 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++20 -Iinclude
 
-SRCS = $(wildcard src/*.cpp)
-OBJS = $(patsubst src/%.cpp, out/%.o, $(SRCS))
+# Helper function to grab files recursively
+rwildcard=$(foreach d,$(wildcard $1*),$(filter $(subst *,%,$2),$d) $(call rwildcard,$d/,$2))
+
+SRCS = $(call rwildcard,src/,*.cpp)
+OBJS = $(patsubst src/%.cpp,out/%.o,$(SRCS))
 
 all: out/mogworld
 
@@ -11,7 +14,7 @@ out/mogworld: $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
 
 out/%.o: src/%.cpp
-	@mkdir -p out
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
