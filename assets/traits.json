@@ -1,0 +1,10 @@
+[
+    {
+      "name": "flammable",
+      "description": "This material can catch fire and burn"
+    },
+    {
+      "name": "slippery",
+      "description": "Entities slide when they move across this surface and could even slip and fall."
+    }
+  ]

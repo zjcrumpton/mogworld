@@ -2,7 +2,7 @@
 #define TRAIT_HPP
 
 #include <string>
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 
 struct Trait {
     std::string name;
