@@ -1,4 +1,5 @@
 #include "MainMenuWindow.hpp"
+#include "EngineContentEditorWindow.hpp"
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QApplication>
@@ -52,8 +53,12 @@ MainMenuWindow::MainMenuWindow(QWidget* parent) : QMainWindow(parent) {
 }
 
 void MainMenuWindow::on_edit_engine_content_clicked() {
-    std::cout << "Edit Engine Content Clicked" << std::endl;
-    // In the future, this will open the EngineContentEditorWindow.
+    std::cout << "Opening Engine Content Editor..." << std::endl;
+
+    auto *editor_window = new EngineContentEditorWindow(this);
+    editor_window->show();
+
+    this->hide();
 }
 
 void MainMenuWindow::on_create_edit_project_clicked() {
