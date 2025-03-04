@@ -2,13 +2,20 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QApplication>
+#include <QLabel>
 #include <iostream>
 
 MainMenuWindow::MainMenuWindow(QWidget* parent) : QMainWindow(parent) {
-    setWindowTitle("Mogworld Editor - Main Menu");
+    setWindowTitle("Mogworld Engine - Main Menu");
+
+    resize(600, 400);
 
     auto *central_widget = new QWidget(this);
     auto *layout = new QVBoxLayout();
+
+    auto *title_label = new QLabel("MogWorld Engine", this);
+    title_label->setAlignment(Qt::AlignCenter);
+    title_label->setStyleSheet("font-size: 40px; font-weight: bold;");
 
     auto *edit_button = new QPushButton("Edit Engine Content", this);
     auto *project_button = new QPushButton("Create or Edit a Game Project", this);
@@ -16,6 +23,14 @@ MainMenuWindow::MainMenuWindow(QWidget* parent) : QMainWindow(parent) {
     auto *run_button = new QPushButton("Run Game Project", this);
     auto *quit_button = new QPushButton("Quit", this);
 
+    QString button_style = "font-size: 18px; padding: 10px;";
+    edit_button->setStyleSheet(button_style);
+    project_button->setStyleSheet(button_style);
+    mod_button->setStyleSheet(button_style);
+    run_button->setStyleSheet(button_style);
+    quit_button->setStyleSheet(button_style);
+
+    layout->addWidget(title_label);
     layout->addWidget(edit_button);
     layout->addWidget(project_button);
     layout->addWidget(mod_button);
