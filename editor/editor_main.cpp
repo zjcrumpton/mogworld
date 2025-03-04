@@ -1,7 +1,10 @@
 #include "MainMenuWindow.hpp"
+#include "Core/Registries/TraitRegistry.hpp"
 #include <QApplication>
 
 int main(int argc, char *argv[]) {
+    TraitRegistry::get().load();
+
     QApplication app(argc, argv);
     app.setStyleSheet(R"(
         QWidget {

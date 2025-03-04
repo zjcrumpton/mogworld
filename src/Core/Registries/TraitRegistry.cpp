@@ -22,7 +22,7 @@ const Trait* TraitRegistry::get_trait(const std::string& name) const {
         return &it->second;
     }
     return nullptr;
-};
+}
 
 std::vector<Trait> TraitRegistry::get_all_traits() const {
     std::vector<Trait> all;
@@ -37,7 +37,7 @@ std::vector<std::string> TraitRegistry::get_all_trait_names() const {
     std::vector<std::string> names;
     names.reserve(traits.size());
     for (const auto& pair : traits) {
-        names.push_back(pair.first);  // Copy just the name
+        names.push_back(pair.first);
     }
     return names;
 }

@@ -6,15 +6,18 @@ MOC = /usr/lib/qt6/libexec/moc
 # Helper to recursively find files
 rwildcard = $(foreach d,$(wildcard $1*),$(filter $(subst *,%,$2),$d) $(call rwildcard,$d/,$2))
 
-# Game sources (normal game logic)
+# Core game/engine sources (everything in src/)
 GAME_SRCS = $(call rwildcard,src/,*.cpp)
+
+# Game target needs all src/*.cpp (including main.cpp)
 GAME_OBJS = $(patsubst src/%.cpp,out/%.o,$(GAME_SRCS))
 
-# Editor sources (Qt-based UI)
-EDITOR_SRCS = $(call rwildcard,editor/,*.cpp)
-EDITOR_OBJS = $(patsubst editor/%.cpp,out/%.o,$(EDITOR_SRCS))
+# Editor needs everything from src/ EXCEPT main.cpp
+EDITOR_SRCS = $(filter-out src/main.cpp, $(call rwildcard,src/,*.cpp)) $(call rwildcard,editor/,*.cpp)
+EDITOR_OBJS = $(patsubst src/%.cpp,out/%.o,$(filter src/%.cpp,$(EDITOR_SRCS))) \
+              $(patsubst editor/%.cpp,out/%.o,$(filter editor/%.cpp,$(EDITOR_SRCS)))
 
-# MOC handling (supports .h and .hpp headers)
+# MOC handling (for Qt signals/slots)
 MOC_HEADERS = $(wildcard editor/*.h) $(wildcard editor/*.hpp)
 MOC_CPP = $(patsubst editor/%.h,out/moc_%.cpp,$(filter %.h,$(MOC_HEADERS))) \
           $(patsubst editor/%.hpp,out/moc_%.cpp,$(filter %.hpp,$(MOC_HEADERS)))
@@ -26,7 +29,7 @@ EDITOR_OBJS += $(MOC_OBJS)
 # Final targets
 all: out/mogworld out/mogworld_editor
 
-# ---- Game target (headless/server/CLI) ----
+# ---- Game target (CLI/server/headless) ----
 out/mogworld: $(GAME_OBJS)
 	@mkdir -p out
 	$(CXX) $(CXXFLAGS) -o $@ $^
@@ -46,8 +49,7 @@ out/%.o: editor/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) `pkg-config --cflags Qt6Widgets` -c $< -o $@
 
-# ---- MOC rules ----
-# Generate MOC .cpp from .h or .hpp
+# ---- MOC rules (Qt code generation) ----
 out/moc_%.cpp: editor/%.h
 	@mkdir -p out
 	$(MOC) $< -o $@
@@ -56,7 +58,6 @@ out/moc_%.cpp: editor/%.hpp
 	@mkdir -p out
 	$(MOC) $< -o $@
 
-# Compile MOC .cpp into .o
 out/moc_%.o: out/moc_%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) `pkg-config --cflags Qt6Widgets` -c $< -o $@

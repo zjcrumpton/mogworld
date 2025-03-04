@@ -41,8 +41,12 @@ EngineContentEditorWindow::EngineContentEditorWindow(QWidget* main_menu, QWidget
 }
 
 void EngineContentEditorWindow::on_edit_traits_clicked() {
-    std::cout << "Edit Traits Clicked" << std::endl;
-    // This is where we’ll soon open the Trait Editor.
+    if (!trait_editor_window) {
+        trait_editor_window = new TraitEditorWindow(this);
+    }
+
+    trait_editor_window->show();
+    this->hide();
 }
 
 void EngineContentEditorWindow::on_back_to_main_menu_clicked() {

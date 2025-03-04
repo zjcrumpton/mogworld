@@ -1,5 +1,6 @@
 #include "MainMenuWindow.hpp"
 #include "EngineContentEditorWindow.hpp"
+#include "Core/Registries/TraitRegistry.hpp"
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QApplication>

@@ -2,6 +2,7 @@
 #define ENGINE_CONTENT_EDITOR_WINDOW_HPP
 
 #include <QMainWindow>
+#include "TraitEditorWindow.hpp"
 
 class EngineContentEditorWindow : public QMainWindow {
     Q_OBJECT
@@ -15,6 +16,7 @@ private slots:
 
 private:
     QWidget* main_menu;
+    TraitEditorWindow* trait_editor_window = nullptr;
 
 };
 
