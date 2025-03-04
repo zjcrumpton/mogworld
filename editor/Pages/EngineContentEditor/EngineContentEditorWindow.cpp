@@ -1,4 +1,4 @@
-#include "EngineContentEditorWindow.hpp"
+#include "Pages/EngineContentEditor/EngineContentEditorWindow.hpp"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>

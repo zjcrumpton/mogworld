@@ -1,4 +1,4 @@
-#include "TraitEditorWindow.hpp"
+#include "Pages/TraitEditor/TraitEditorWindow.hpp"
 #include "Core/Registries/TraitRegistry.hpp"
 #include <QPushButton>
 #include <QVBoxLayout>
