@@ -4,11 +4,18 @@
             "name": "WSL",
             "includePath": [
                 "${workspaceFolder}/include",
-                "${workspaceFolder}/include/nlohmann",    // 👈 Optional, but doesn't hurt
-                "/usr/include/**",                         // WSL system headers
-                "/usr/local/include/**"
+                "${workspaceFolder}/editor", 
+                "${workspaceFolder}/src",
+                "/usr/include/x86_64-linux-gnu/qt6",
+                "/usr/include/x86_64-linux-gnu/qt6/QtCore",
+                "/usr/include/x86_64-linux-gnu/qt6/QtGui",
+                "/usr/include/x86_64-linux-gnu/qt6/QtWidgets"
             ],
-            "defines": [],
+            "defines": [
+                "QT_CORE_LIB",
+                "QT_GUI_LIB",
+                "QT_WIDGETS_LIB"
+            ],
             "compilerPath": "/usr/bin/g++",
             "cStandard": "c17",
             "cppStandard": "c++20",

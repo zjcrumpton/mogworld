@@ -17,7 +17,7 @@ public:
 private:
     std::unordered_map<std::string, Trait> traits;
     void load_traits_from_file(const std::string& path);
-    
+     
 };
 
 #endif
