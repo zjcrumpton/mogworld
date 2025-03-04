@@ -15,6 +15,7 @@ public:
 
     void load();
     void clear();
+    void remove_trait(const std::string& name);
 
     bool is_known_trait(const std::string& name) const;
     const Trait* get_trait(const std::string& name) const;

@@ -58,3 +58,13 @@ void TraitRegistry::load_traits_from_file(const std::string& path) {
 
     std::cout << "Loaded " << loaded_traits.size() << " traits from " << path << std::endl;
 }
+
+void TraitRegistry::remove_trait(const std::string& name) {
+    auto it = traits.find(name);
+    if (it != traits.end()) {
+        traits.erase(it);
+        std::cout << "Trait '" << name << "' removed." << std::endl;
+    } else {
+        std::cout << "Trait '" << name << "' not found, can't remove." << std::endl;
+    }
+}

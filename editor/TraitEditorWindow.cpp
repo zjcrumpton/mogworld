@@ -10,7 +10,6 @@
 TraitEditorWindow::TraitEditorWindow(QWidget* parent_window, QWidget* parent)
     : QMainWindow(parent), parent_window(parent_window)
 {
-    TraitRegistry& registry = TraitRegistry::get();
     setWindowTitle("Mogworld Editor - Trait Editor");
     setMinimumSize(800, 800);
     resize(1000, 800);
@@ -24,10 +23,8 @@ TraitEditorWindow::TraitEditorWindow(QWidget* parent_window, QWidget* parent)
     title_label->setAlignment(Qt::AlignCenter);
     title_label->setStyleSheet("font-size: 40px; font-weight: bold;");
 
-    auto trait_list = new QListWidget(this);
-    for (const auto& trait : registry.get_all_traits()) {
-        trait_list->addItem(QString::fromStdString(trait.name));
-    }
+    trait_list = new QListWidget(this); 
+    refresh_trait_list();           
 
     auto* add_button = new QPushButton("Add Trait", this);
     auto* edit_button = new QPushButton("Edit Selected Trait", this);
@@ -57,25 +54,46 @@ TraitEditorWindow::TraitEditorWindow(QWidget* parent_window, QWidget* parent)
     connect(back_button, &QPushButton::clicked, this, &TraitEditorWindow::on_back_to_content_editor_clicked);
 }
 
+void TraitEditorWindow::refresh_trait_list() {
+    trait_list->clear();
+    for (const auto& trait : TraitRegistry::get().get_all_traits()) {
+        trait_list->addItem(QString::fromStdString(trait.name));
+    }
+}
+
+void TraitEditorWindow::showEvent(QShowEvent* event) {
+    QMainWindow::showEvent(event);
+    refresh_trait_list();  // Reload every time we show the window
+}
+
 void TraitEditorWindow::on_add_trait_clicked() {
     std::cout << "Add Trait Clicked" << std::endl;
-    // Future: Open an "Add Trait" dialog.
+    // Placeholder - Add Trait dialog goes here in future
+
+    refresh_trait_list();  // For now just refresh to simulate "something changed"
 }
 
 void TraitEditorWindow::on_edit_trait_clicked() {
     std::cout << "Edit Trait Clicked" << std::endl;
-    // Future: Check which trait is selected and open an "Edit Trait" dialog.
+    // Placeholder - Edit Trait dialog in future
 }
 
 void TraitEditorWindow::on_delete_trait_clicked() {
-    std::cout << "Delete Trait Clicked" << std::endl;
-    // Future: Remove the selected trait from the registry.
+    auto selected = trait_list->currentItem();
+    if (selected) {
+        std::string name = selected->text().toStdString();
+        std::cout << "Deleting trait: " << name << std::endl;
+
+        TraitRegistry::get().remove_trait(name);
+        refresh_trait_list();
+    } else {
+        std::cout << "No trait selected to delete." << std::endl;
+    }
 }
 
 void TraitEditorWindow::on_back_to_content_editor_clicked() {
     if (parent_window) {
         parent_window->show();
     }
-
     close();
 }
