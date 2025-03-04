@@ -1,4 +1,5 @@
 #include "Pages/EngineContentEditor/EngineContentEditorWindow.hpp"
+#include "Shared/WindowUtils.hpp"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -45,6 +46,7 @@ void EngineContentEditorWindow::on_edit_traits_clicked() {
         trait_editor_window = new TraitEditorWindow(this);
     }
 
+    center_on_parent(trait_editor_window, this);
     trait_editor_window->show();
     this->hide();
 }

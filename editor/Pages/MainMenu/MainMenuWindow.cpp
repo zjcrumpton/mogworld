@@ -1,6 +1,7 @@
 #include "MainMenuWindow.hpp"
 #include "Pages/EngineContentEditor/EngineContentEditorWindow.hpp"
 #include "Core/Registries/TraitRegistry.hpp"
+#include "Shared/WindowUtils.hpp"
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QApplication>
@@ -57,6 +58,7 @@ void MainMenuWindow::on_edit_engine_content_clicked() {
     std::cout << "Opening Engine Content Editor..." << std::endl;
 
     auto *editor_window = new EngineContentEditorWindow(this);
+    center_on_parent(editor_window, this);
     editor_window->show();
 
     this->hide();

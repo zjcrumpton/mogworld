@@ -1,5 +1,6 @@
 #include "Pages/TraitEditor/TraitEditorWindow.hpp"
 #include "Core/Registries/TraitRegistry.hpp"
+#include "Shared/WindowUtils.hpp"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -93,6 +94,7 @@ void TraitEditorWindow::on_delete_trait_clicked() {
 
 void TraitEditorWindow::on_back_to_content_editor_clicked() {
     if (parent_window) {
+        center_on_parent(parent_window, this);
         parent_window->show();
     }
     close();
