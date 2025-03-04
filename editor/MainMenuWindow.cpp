@@ -8,7 +8,8 @@
 MainMenuWindow::MainMenuWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle("Mogworld Engine - Main Menu");
 
-    resize(600, 400);
+    setMinimumSize(800, 800);
+    resize(1000, 800);
 
     auto *central_widget = new QWidget(this);
     auto *layout = new QVBoxLayout();
@@ -16,6 +17,7 @@ MainMenuWindow::MainMenuWindow(QWidget* parent) : QMainWindow(parent) {
     auto *title_label = new QLabel("MogWorld Engine", this);
     title_label->setAlignment(Qt::AlignCenter);
     title_label->setStyleSheet("font-size: 40px; font-weight: bold;");
+    title_label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     auto *edit_button = new QPushButton("Edit Engine Content", this);
     auto *project_button = new QPushButton("Create or Edit a Game Project", this);
@@ -23,12 +25,11 @@ MainMenuWindow::MainMenuWindow(QWidget* parent) : QMainWindow(parent) {
     auto *run_button = new QPushButton("Run Game Project", this);
     auto *quit_button = new QPushButton("Quit", this);
 
-    QString button_style = "font-size: 18px; padding: 10px;";
-    edit_button->setStyleSheet(button_style);
-    project_button->setStyleSheet(button_style);
-    mod_button->setStyleSheet(button_style);
-    run_button->setStyleSheet(button_style);
-    quit_button->setStyleSheet(button_style);
+    edit_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    project_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    mod_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    run_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    quit_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     layout->addWidget(title_label);
     layout->addWidget(edit_button);
@@ -36,6 +37,9 @@ MainMenuWindow::MainMenuWindow(QWidget* parent) : QMainWindow(parent) {
     layout->addWidget(mod_button);
     layout->addWidget(run_button);
     layout->addWidget(quit_button);
+
+    layout->setContentsMargins(20, 20, 20, 20);
+    layout->setSpacing(15);
 
     central_widget->setLayout(layout);
     setCentralWidget(central_widget);
