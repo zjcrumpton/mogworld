@@ -12,6 +12,16 @@ void TraitRegistry::clear() {
     traits.clear();
 }
 
+void TraitRegistry::add_or_update_trait(const Trait& trait) {
+    traits[trait.name] = trait;
+    save_traits_to_file("assets/traits.json");  // Automatically save after any change
+}
+
+void TraitRegistry::remove_trait(const std::string& name) {
+    traits.erase(name);
+    save_traits_to_file("assets/traits.json");  // Automatically save after any change
+}
+
 bool TraitRegistry::is_known_trait(const std::string& name) const {
     return traits.find(name) != traits.end();
 }
@@ -59,12 +69,18 @@ void TraitRegistry::load_traits_from_file(const std::string& path) {
     std::cout << "Loaded " << loaded_traits.size() << " traits from " << path << std::endl;
 }
 
-void TraitRegistry::remove_trait(const std::string& name) {
-    auto it = traits.find(name);
-    if (it != traits.end()) {
-        traits.erase(it);
-        std::cout << "Trait '" << name << "' removed." << std::endl;
-    } else {
-        std::cout << "Trait '" << name << "' not found, can't remove." << std::endl;
+void TraitRegistry::save_traits_to_file(const std::string& path) const {
+    std::ofstream file(path);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open traits file for writing: " + path);
     }
+
+    std::vector<Trait> all_traits;
+    all_traits.reserve(traits.size());
+    for (const auto& [name, trait] : traits) {
+        all_traits.push_back(trait);
+    }
+
+    nlohmann::json json = all_traits;
+    file << json.dump(4);
 }

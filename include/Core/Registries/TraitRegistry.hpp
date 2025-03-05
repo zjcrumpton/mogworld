@@ -15,24 +15,27 @@ public:
 
     void load();
     void clear();
-    void remove_trait(const std::string& name);
+
+    void add_or_update_trait(const Trait& trait);
+    void remove_trait(const std::string& name); 
 
     bool is_known_trait(const std::string& name) const;
     const Trait* get_trait(const std::string& name) const;
     std::vector<Trait> get_all_traits() const;
     std::vector<std::string> get_all_trait_names() const;
 
-    // Deleted to prevent copies/clones (singletons should only exist once)
+    // Deleted to prevent copies/clones (singleton enforcement)
     TraitRegistry(const TraitRegistry&) = delete;
     TraitRegistry& operator=(const TraitRegistry&) = delete;
 
 private:
-    TraitRegistry() = default;  // Private constructor so no one can manually create it
+    TraitRegistry() = default;
     ~TraitRegistry() = default;
 
     std::unordered_map<std::string, Trait> traits;
 
     void load_traits_from_file(const std::string& path);
+    void save_traits_to_file(const std::string& path) const;
 };
 
 #endif // TRAIT_REGISTRY_HPP

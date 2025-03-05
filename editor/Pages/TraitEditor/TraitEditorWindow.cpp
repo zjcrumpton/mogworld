@@ -1,11 +1,12 @@
-#include "Pages/TraitEditor/TraitEditorWindow.hpp"
+#include "TraitEditorWindow.hpp"
 #include "Core/Registries/TraitRegistry.hpp"
-#include "Shared/WindowUtils.hpp"
+#include "Pages/TraitEditor/AddEditTraitDialog.hpp"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QLabel>
-#include <QListWidget>
+#include <QMessageBox>
+#include <Shared/Message.hpp>
 #include <iostream>
 
 TraitEditorWindow::TraitEditorWindow(QWidget* parent_window, QWidget* parent)
@@ -25,7 +26,7 @@ TraitEditorWindow::TraitEditorWindow(QWidget* parent_window, QWidget* parent)
     title_label->setStyleSheet("font-size: 40px; font-weight: bold;");
 
     trait_list = new QListWidget(this); 
-    refresh_trait_list();           
+    refresh_trait_list();
 
     auto* add_button = new QPushButton("Add Trait", this);
     auto* edit_button = new QPushButton("Edit Selected Trait", this);
@@ -64,37 +65,66 @@ void TraitEditorWindow::refresh_trait_list() {
 
 void TraitEditorWindow::showEvent(QShowEvent* event) {
     QMainWindow::showEvent(event);
-    refresh_trait_list();  // Reload every time we show the window
+    refresh_trait_list();
 }
 
 void TraitEditorWindow::on_add_trait_clicked() {
-    std::cout << "Add Trait Clicked" << std::endl;
-    // Placeholder - Add Trait dialog goes here in future
+    AddEditTraitDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        Trait new_trait = dialog.get_trait();
 
-    refresh_trait_list();  // For now just refresh to simulate "something changed"
+        auto& registry = TraitRegistry::get();
+        if (registry.is_known_trait(new_trait.name)) {
+            Message::show_error("Trait already exists with name: " + new_trait.name + ".", this);
+        } else {
+            registry.add_or_update_trait(new_trait);
+            refresh_trait_list();
+        }
+    }
 }
 
 void TraitEditorWindow::on_edit_trait_clicked() {
-    std::cout << "Edit Trait Clicked" << std::endl;
-    // Placeholder - Edit Trait dialog in future
+    auto selected = trait_list->currentItem();
+    if (!selected) {
+        Message::show_error("No trait selected for editing.", this);
+        return;
+    }
+
+    std::string old_name = selected->text().toStdString();
+    const Trait* existing_trait = TraitRegistry::get().get_trait(old_name);
+
+    if (!existing_trait) {
+        Message::show_error("Selected trait not found in registry.", this);
+        return;
+    }
+
+    Trait editable_trait = *existing_trait;
+    AddEditTraitDialog dialog(editable_trait, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        Trait final_trait = dialog.get_trait();
+        // Handle renaming (name changed in dialog)
+        if (final_trait.name != old_name) {
+            TraitRegistry::get().remove_trait(old_name);  // Remove old name entry
+        }
+
+        TraitRegistry::get().add_or_update_trait(final_trait);
+        refresh_trait_list();
+    }
 }
 
 void TraitEditorWindow::on_delete_trait_clicked() {
-    auto selected = trait_list->currentItem();
-    if (selected) {
-        std::string name = selected->text().toStdString();
-        std::cout << "Deleting trait: " << name << std::endl;
-
+    auto* selected_item = trait_list->currentItem();
+    if (selected_item) {
+        std::string name = selected_item->text().toStdString();
         TraitRegistry::get().remove_trait(name);
         refresh_trait_list();
     } else {
-        std::cout << "No trait selected to delete." << std::endl;
+        Message::show_error("No trait selected to delete.", this);
     }
 }
 
 void TraitEditorWindow::on_back_to_content_editor_clicked() {
     if (parent_window) {
-        center_on_parent(parent_window, this);
         parent_window->show();
     }
     close();
