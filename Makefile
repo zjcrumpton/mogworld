@@ -1,6 +1,6 @@
 # Compiler setup
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++20 -Iinclude -Ieditor
+CXXFLAGS = -Wall -Wextra -std=c++20 -Iinclude -Ieditor -Isrc
 MOC = /usr/lib/qt6/libexec/moc
 
 # Helper to recursively find files
@@ -10,9 +10,12 @@ rwildcard = $(foreach d,$(wildcard $1*),$(filter $(subst *,%,$2),$d) $(call rwil
 GAME_SRCS = $(call rwildcard,src/,*.cpp)
 GAME_OBJS = $(patsubst src/%.cpp,out/%.o,$(GAME_SRCS))
 
-# Editor sources (Qt-based UI) + Core files needed by editor (like TraitRegistry)
-EDITOR_SRCS = $(call rwildcard,editor/,*.cpp) $(call rwildcard,src/Core/Registries/,*.cpp)
-EDITOR_OBJS = $(patsubst src/%.cpp,out/%.o,$(filter src/Core/Registries/%, $(EDITOR_SRCS))) \
+# Editor sources (Qt-based UI) + Core files needed by editor (like TraitRegistry, Trait)
+EDITOR_SRCS = $(call rwildcard,editor/,*.cpp) \
+              $(call rwildcard,src/Core/Registries/,*.cpp) \
+              $(call rwildcard,src/Core/World/,*.cpp)
+
+EDITOR_OBJS = $(patsubst src/%.cpp,out/%.o,$(filter src/%, $(EDITOR_SRCS))) \
               $(patsubst editor/%.cpp,out/%.o,$(filter editor/%, $(EDITOR_SRCS)))
 
 # MOC handling
