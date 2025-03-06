@@ -1,16 +1,14 @@
 #ifndef MATERIAL_REGISTRY_HPP
 #define MATERIAL_REGISTRY_HPP
 
-#include <unordered_map>
-#include <string>
 #include "Core/World/Material.hpp"
+#include "Macros/SingletonMacro.hpp"
+#include "Core/Registries/JsonRegistryBase.hpp"
 
-class MaterialRegistry {
-public:
-    void load();
+inline constexpr char FILE_PATH[] = "assets/materials.json";
 
-private:
-    std::unordered_map<std::string, Material> materials;
+class MaterialRegistry : public JsonRegistryBase<Material, FILE_PATH> {
+    DECLARE_SINGLETON(MaterialRegistry)
 };
 
 #endif // MATERIAL_REGISTRY_HPP

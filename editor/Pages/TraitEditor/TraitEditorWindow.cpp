@@ -58,7 +58,7 @@ TraitEditorWindow::TraitEditorWindow(QWidget* parent_window, QWidget* parent)
 
 void TraitEditorWindow::refresh_trait_list() {
     trait_list->clear();
-    for (const auto& trait : TraitRegistry::get().get_all_traits()) {
+    for (const auto& trait : TraitRegistry::get().get_all()) {
         trait_list->addItem(QString::fromStdString(trait.name));
     }
 }
@@ -74,10 +74,10 @@ void TraitEditorWindow::on_add_trait_clicked() {
         Trait new_trait = dialog.get_trait();
 
         auto& registry = TraitRegistry::get();
-        if (registry.is_known_trait(new_trait.name)) {
+        if (registry.is_known(new_trait.name)) {
             Message::show_error("Trait already exists with name: " + new_trait.name + ".", this);
         } else {
-            registry.add_or_update_trait(new_trait);
+            registry.add_or_update(new_trait);
             refresh_trait_list();
         }
     }
@@ -91,8 +91,7 @@ void TraitEditorWindow::on_edit_trait_clicked() {
     }
 
     std::string old_name = selected->text().toStdString();
-    const Trait* existing_trait = TraitRegistry::get().get_trait(old_name);
-
+    const Trait* existing_trait = TraitRegistry::get().find_by_name(old_name); 
     if (!existing_trait) {
         Message::show_error("Selected trait not found in registry.", this);
         return;
@@ -104,10 +103,10 @@ void TraitEditorWindow::on_edit_trait_clicked() {
         Trait final_trait = dialog.get_trait();
         // Handle renaming (name changed in dialog)
         if (final_trait.name != old_name) {
-            TraitRegistry::get().remove_trait(old_name);  // Remove old name entry
+            TraitRegistry::get().remove(old_name);  // Remove old name entry
         }
 
-        TraitRegistry::get().add_or_update_trait(final_trait);
+        TraitRegistry::get().add_or_update(final_trait);
         refresh_trait_list();
     }
 }
@@ -116,7 +115,7 @@ void TraitEditorWindow::on_delete_trait_clicked() {
     auto* selected_item = trait_list->currentItem();
     if (selected_item) {
         std::string name = selected_item->text().toStdString();
-        TraitRegistry::get().remove_trait(name);
+        TraitRegistry::get().remove(name);
         refresh_trait_list();
     } else {
         Message::show_error("No trait selected to delete.", this);

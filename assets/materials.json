@@ -1,1 +1,12 @@
-[]
+[
+    {
+        "name": "wood",
+        "description": "Common material from trees.",
+        "traits": ["flammable"]
+    },
+    {
+        "name": "steel",
+        "description": "Strong alloy used for tools and weapons.",
+        "traits": ["conductive"]
+    }
+]

@@ -1,41 +1,14 @@
 #ifndef TRAIT_REGISTRY_HPP
 #define TRAIT_REGISTRY_HPP
 
-#include <string>
-#include <unordered_map>
-#include <vector>
 #include "Core/World/Trait.hpp"
+#include "Macros/SingletonMacro.hpp"
+#include "Core/Registries/JsonRegistryBase.hpp"
 
-class TraitRegistry {
-public:
-    static TraitRegistry& get() {
-        static TraitRegistry instance;
-        return instance;
-    }
+inline constexpr char FILE_PATH[] = "assets/traits.json";
 
-    void load();
-    void clear();
-
-    void add_or_update_trait(const Trait& trait);
-    void remove_trait(const std::string& name); 
-
-    bool is_known_trait(const std::string& name) const;
-    const Trait* get_trait(const std::string& name) const;
-    std::vector<Trait> get_all_traits() const;
-    std::vector<std::string> get_all_trait_names() const;
-
-    // Deleted to prevent copies/clones (singleton enforcement)
-    TraitRegistry(const TraitRegistry&) = delete;
-    TraitRegistry& operator=(const TraitRegistry&) = delete;
-
-private:
-    TraitRegistry() = default;
-    ~TraitRegistry() = default;
-
-    std::unordered_map<std::string, Trait> traits;
-
-    void load_traits_from_file(const std::string& path);
-    void save_traits_to_file(const std::string& path) const;
+class TraitRegistry : public JsonRegistryBase<Trait, FILE_PATH> {
+    DECLARE_SINGLETON(TraitRegistry)
 };
 
 #endif // TRAIT_REGISTRY_HPP
