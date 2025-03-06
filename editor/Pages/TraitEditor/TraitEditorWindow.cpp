@@ -1,6 +1,6 @@
 #include "TraitEditorWindow.hpp"
 #include "Core/Registries/TraitRegistry.hpp"
-#include "Pages/TraitEditor/AddEditTraitDialog.hpp"
+#include "Pages/EngineContentEditor/AutoEditorDialog.hpp"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -10,7 +10,7 @@
 #include <iostream>
 
 TraitEditorWindow::TraitEditorWindow(QWidget* parent_window, QWidget* parent)
-    : QMainWindow(parent), parent_window(parent_window)
+    : QMainWindow(parent), parent_window(parent_window) 
 {
     setWindowTitle("Mogworld Editor - Trait Editor");
     setMinimumSize(800, 800);
@@ -33,20 +33,12 @@ TraitEditorWindow::TraitEditorWindow(QWidget* parent_window, QWidget* parent)
     auto* delete_button = new QPushButton("Delete Selected Trait", this);
     auto* back_button = new QPushButton("Back to Engine Content Editor", this);
 
-    add_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    edit_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    delete_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    back_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
     layout->addWidget(title_label);
     layout->addWidget(trait_list);
     layout->addWidget(add_button);
     layout->addWidget(edit_button);
     layout->addWidget(delete_button);
     layout->addWidget(back_button);
-
-    layout->setContentsMargins(20, 20, 20, 20);
-    layout->setSpacing(15);
 
     central_widget->setLayout(layout);
 
@@ -69,9 +61,11 @@ void TraitEditorWindow::showEvent(QShowEvent* event) {
 }
 
 void TraitEditorWindow::on_add_trait_clicked() {
-    AddEditTraitDialog dialog(this);
+    Trait new_trait;
+    AutoEditorDialog<Trait> dialog(new_trait, this);
+
     if (dialog.exec() == QDialog::Accepted) {
-        Trait new_trait = dialog.get_trait();
+        dialog.applyChanges();
 
         auto& registry = TraitRegistry::get();
         if (registry.is_known(new_trait.name)) {
@@ -91,22 +85,28 @@ void TraitEditorWindow::on_edit_trait_clicked() {
     }
 
     std::string old_name = selected->text().toStdString();
-    const Trait* existing_trait = TraitRegistry::get().find_by_name(old_name); 
+    const Trait* existing_trait = TraitRegistry::get().find_by_name(old_name);
     if (!existing_trait) {
         Message::show_error("Selected trait not found in registry.", this);
         return;
     }
 
+    // Copy the trait because it's immutable in the registry.
     Trait editable_trait = *existing_trait;
-    AddEditTraitDialog dialog(editable_trait, this);
+
+    // Open the editor dialog with the copy.
+    AutoEditorDialog<Trait> dialog(editable_trait, this);
+
     if (dialog.exec() == QDialog::Accepted) {
-        Trait final_trait = dialog.get_trait();
-        // Handle renaming (name changed in dialog)
-        if (final_trait.name != old_name) {
-            TraitRegistry::get().remove(old_name);  // Remove old name entry
+        dialog.applyChanges();
+
+        auto& registry = TraitRegistry::get();
+
+        if (editable_trait.name != old_name) {
+            registry.remove(old_name);  // Name changed — remove old one
         }
 
-        TraitRegistry::get().add_or_update(final_trait);
+        registry.add_or_update(editable_trait);
         refresh_trait_list();
     }
 }
