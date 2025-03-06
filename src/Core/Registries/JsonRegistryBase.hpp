@@ -37,10 +37,12 @@ public:
 
     void add_or_update(const T& item) {
         data[item.name] = item;
+        save();
     }
 
     void remove(const std::string& name) {
         data.erase(name);
+        save();
     }
 
     std::vector<T> get_all() const {
