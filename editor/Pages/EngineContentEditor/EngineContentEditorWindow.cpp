@@ -43,7 +43,7 @@ EngineContentEditorWindow::EngineContentEditorWindow(QWidget* main_menu, QWidget
 
 void EngineContentEditorWindow::on_edit_traits_clicked() {
     if (!trait_editor_window) {
-        trait_editor_window = new TraitEditorWindow(this);
+        trait_editor_window = new TraitEditorWindow("Trait Editor", this);
     }
 
     center_on_parent(trait_editor_window, this);

@@ -2,7 +2,7 @@
 #define ENGINE_CONTENT_EDITOR_WINDOW_HPP
 
 #include <QMainWindow>
-#include "Pages/TraitEditor/TraitEditorWindow.hpp"
+#include "Editors/TraitEditorWindow.hpp"
 
 class EngineContentEditorWindow : public QMainWindow {
     Q_OBJECT

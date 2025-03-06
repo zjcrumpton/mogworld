@@ -34,8 +34,6 @@ public:
                     // had to use dynamic cast instead of proper qobject_cast
                     // because this class is templated - should be safe though
                     auto* lineEdit = dynamic_cast<QLineEdit*>(editor);
-                    std::string* fieldPtr = getFieldPtr<std::string>(field.offset);
-
 
                     if (lineEdit) {
                         *getFieldPtr<std::string>(field.offset) = lineEdit->text().toStdString();
