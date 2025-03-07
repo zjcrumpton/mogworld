@@ -3,6 +3,9 @@
 
 #define DEFINE_REGISTRY_REFERENCE(Type, RegistryType)                \
     struct Type##Reference {                                          \
+        using TargetType = Type;                                      \
+        using Registry = RegistryType;                                \
+                                                                      \
         std::string name;                                             \
                                                                       \
         const Type* resolve() const {                                 \
@@ -22,4 +25,4 @@
         j.get_to(ref.name);                                           \
     }
 
-    #endif // REFERENCE_REGISTRY_HPP
+#endif // REFERENCE_REGISTRY_HPP

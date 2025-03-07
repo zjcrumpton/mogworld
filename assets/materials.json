@@ -1,16 +1,16 @@
 [
     {
-        "description": "Strong alloy used for tools and weapons.",
-        "name": "steel",
-        "traits": [
-            "conductive"
-        ]
-    },
-    {
         "description": "Common material from trees.",
         "name": "wood",
         "traits": [
             "flammable"
+        ]
+    },
+    {
+        "description": "Strong alloy used for tools and weapons.",
+        "name": "steel",
+        "traits": [
+            "conductive"
         ]
     }
 ]
