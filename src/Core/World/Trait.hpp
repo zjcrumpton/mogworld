@@ -2,7 +2,7 @@
 #define TRAIT_HPP
 
 #include <string>
-#include "Macros/ReflectionMacro.hpp"
+#include "Core/Macros/ReflectionMacro.hpp"
 
 struct Trait {
     std::string name;

@@ -2,7 +2,7 @@
 #define MATERIAL_REGISTRY_HPP
 
 #include "Core/World/Material.hpp"
-#include "Macros/SingletonMacro.hpp"
+#include "Core/Macros/SingletonMacro.hpp"
 #include "Core/Registries/JsonRegistryBase.hpp"
 #include "Core/Registries/RegistryReference.hpp"
 

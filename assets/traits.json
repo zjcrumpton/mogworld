@@ -1,14 +1,14 @@
 [
     {
-        "description": "Conducts electricity.",
-        "name": "conductive"
+        "description": "This material can catch fire and burn",
+        "name": "flammable"
     },
     {
         "description": "Entities slide when they move across this surface and could even slip and fall.",
         "name": "slippery"
     },
     {
-        "description": "This material can catch fire and burn",
-        "name": "flammable"
+        "description": "Conducts electricity.",
+        "name": "conductive"
     }
 ]

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include "Core/World/Trait.hpp"
-#include "Macros/ReflectionMacro.hpp"
+#include "Core/Macros/ReflectionMacro.hpp"
 #include "Core/Registries/TraitRegistry.hpp"
 
 struct Material {

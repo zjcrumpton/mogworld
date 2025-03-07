@@ -2,7 +2,7 @@
 #define TRAIT_REGISTRY_HPP
 
 #include "Core/World/Trait.hpp"
-#include "Macros/SingletonMacro.hpp"
+#include "Core/Macros/SingletonMacro.hpp"
 #include "Core/Registries/JsonRegistryBase.hpp"
 #include "Core/Registries/RegistryReference.hpp"
 
