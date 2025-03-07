@@ -3,7 +3,7 @@
         "description": "Common material from trees.",
         "name": "wood",
         "traits": [
-            "flammable"
+            "flammable", "conductive"
         ]
     },
     {

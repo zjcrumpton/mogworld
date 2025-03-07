@@ -7,20 +7,16 @@
 #include <QDialogButtonBox>
 #include <QListWidget>
 #include <QComboBox>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <unordered_map>
 #include <string>
 #include <typeinfo>
 #include <cstddef>
 #include <iostream>
 #include <QMessageBox>
-
-// Core trait and material references (expand this list if you add more later)
 #include "Core/World/Trait.hpp"
-#include "Core/World/Material.hpp"
-
-// This is the key — each Reference<> defines its own `TargetType` and `Registry`.
 #include "Core/Registries/TraitRegistry.hpp"
-#include "Core/Registries/MaterialRegistry.hpp"
 
 template<typename T>
 class AutoEditorDialog : public QDialog {
@@ -36,18 +32,17 @@ public:
 
     void applyChanges() {
         for (const auto& field : T::getFields()) {
-            if (editors.find(field.name) != editors.end()) {
-                QWidget* editor = editors[field.name];
+            if (!editors.contains(field.name)) continue;
 
-                if (field.typeName == typeid(std::string).name()) {
-                    auto* lineEdit = dynamic_cast<QLineEdit*>(editor);
-                    if (lineEdit) {
-                        *getFieldPtr<std::string>(field.offset) = lineEdit->text().toStdString();
-                    }
-                } 
-                else if (is_reference_vector_field(field)) {
-                    applyReferenceListChanges(field, editor);
+            QWidget* editor = editors[field.name];
+
+            if (field.typeName == typeid(std::string).name()) {
+                auto* lineEdit = dynamic_cast<QLineEdit*>(editor);
+                if (lineEdit) {
+                    *getFieldPtr<std::string>(field.offset) = lineEdit->text().toStdString();
                 }
+            } else if (field.name == "traits") {
+                applyReferenceListChangesFor<TraitReference>(editor, field);
             }
         }
     }
@@ -67,24 +62,38 @@ private:
             QWidget* editor = nullptr;
 
             if (field.typeName == typeid(std::string).name()) {
-                auto* lineEdit = new QLineEdit(this);
-                lineEdit->setText(QString::fromStdString(*getFieldPtr<std::string>(field.offset)));
-                editor = lineEdit;
-            } 
-            else if (is_reference_vector_field(field)) {
-                auto* listWidget = new QListWidget(this);
-                setupReferenceListEditor(listWidget, field);
-                editor = listWidget;
+                editor = setupStringEditor(field);
+            } else if (field.name == "traits") {
+                editor = setupReferenceListEditorFor<TraitReference>(field);
             }
 
             if (editor) {
                 layout->addRow(QString::fromStdString(field.name), editor);
                 editors[field.name] = editor;
             } else {
-                QMessageBox::warning(this, "Unsupported Field", 
+                QMessageBox::warning(this, "Unsupported Field",
                     QString("Cannot edit field '%1' (unsupported type)").arg(QString::fromStdString(field.name)));
             }
         }
+    }
+
+    QWidget* setupStringEditor(const FieldInfo& field) {
+        auto* lineEdit = new QLineEdit(this);
+        lineEdit->setText(QString::fromStdString(*getFieldPtr<std::string>(field.offset)));
+        return lineEdit;
+    }
+
+    template<typename RefType>
+    QListWidget* setupReferenceListEditorFor(const FieldInfo& field) {
+        auto* listWidget = new QListWidget(this);
+        auto& refs = *getFieldPtr<std::vector<RefType>>(field.offset);
+
+        for (const auto& ref : refs) {
+            addReferenceItem<RefType>(listWidget, ref.name);
+        }
+
+        addAddButton<RefType>(listWidget);
+        return listWidget;
     }
 
     void setupButtons() {
@@ -92,76 +101,88 @@ private:
         layout->addRow(buttonBox);
 
         connect(buttonBox, &QDialogButtonBox::accepted, this, [this]() {
+            applyChanges();
             accept();
         });
         connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
     }
 
-    bool is_reference_vector_field(const FieldInfo& field) const {
-        return field.typeName.find("Reference") != std::string::npos &&
-               field.typeName.find("vector") != std::string::npos;
-    }
-
-    // Helper to call the correct editor setup based on field name
-    void setupReferenceListEditor(QListWidget* listWidget, const FieldInfo& field) {
-        if (field.name == "traits") {
-            setupReferenceListEditorFor<TraitReference>(listWidget, field);
-        } 
-        else if (field.name == "materials") {
-            setupReferenceListEditorFor<MaterialReference>(listWidget, field);
-        } 
-        else {
-            QMessageBox::warning(this, "Unsupported Reference Field",
-                                 QString("Cannot edit reference field '%1' (no known handler)")
-                                 .arg(QString::fromStdString(field.name)));
-        }
-    }
-
-    // Generic list setup for any Reference<T>
     template<typename RefType>
-    void setupReferenceListEditorFor(QListWidget* listWidget, const FieldInfo& field) {
-        auto& refs = *getFieldPtr<std::vector<RefType>>(field.offset);
-
-        for (const auto& ref : refs) {
-            auto* item = new QListWidgetItem(listWidget);
-            auto* comboBox = new QComboBox(listWidget);
-
-            for (const auto& name : RefType::Registry::get().get_all_names()) {
-                comboBox->addItem(QString::fromStdString(name));
-            }
-
-            comboBox->setCurrentText(QString::fromStdString(ref.name));
-            listWidget->addItem(item);
-            listWidget->setItemWidget(item, comboBox);
-        }
-    }
-
-    void applyReferenceListChanges(const FieldInfo& field, QWidget* editor) {
+    void applyReferenceListChangesFor(QWidget* editor, const FieldInfo& field) {
         auto* listWidget = dynamic_cast<QListWidget*>(editor);
         if (!listWidget) return;
 
-        if (field.name == "traits") {
-            applyReferenceListChangesFor<TraitReference>(listWidget, field);
-        } 
-        else if (field.name == "materials") {
-            applyReferenceListChangesFor<MaterialReference>(listWidget, field);
-        }
-    }
-
-    template<typename RefType>
-    void applyReferenceListChangesFor(QListWidget* listWidget, const FieldInfo& field) {
         auto& refs = *getFieldPtr<std::vector<RefType>>(field.offset);
         refs.clear();
 
-        for (int i = 0; i < listWidget->count(); ++i) {
+        for (int i = 0; i < listWidget->count() - 1; ++i) {  // Skip last "Add Reference" item
             auto* item = listWidget->item(i);
-            auto* comboBox = dynamic_cast<QComboBox*>(listWidget->itemWidget(item));
+            auto* rowWidget = dynamic_cast<QWidget*>(listWidget->itemWidget(item));
+            if (!rowWidget) continue;
+
+            auto* comboBox = rowWidget->findChild<QComboBox*>();
             if (comboBox) {
                 RefType ref;
                 ref.name = comboBox->currentText().toStdString();
                 refs.push_back(ref);
             }
         }
+    }
+
+    template<typename RefType>
+    void addReferenceItem(QListWidget* listWidget, const std::string& initialName = "") {
+        auto* item = new QListWidgetItem(listWidget);
+        auto* rowWidget = new QWidget(listWidget);
+        auto* layout = new QHBoxLayout(rowWidget);
+        layout->setContentsMargins(0, 0, 0, 0);
+
+        auto* comboBox = new QComboBox(rowWidget);
+        for (const auto& name : RefType::Registry::get().get_all_names()) {
+            comboBox->addItem(QString::fromStdString(name));
+        }
+        comboBox->setCurrentText(QString::fromStdString(initialName));
+
+        auto* removeButton = new QPushButton("❌", rowWidget);
+        removeButton->setFixedWidth(30);
+
+        QObject::connect(removeButton, &QPushButton::clicked, [listWidget, item]() {
+            delete listWidget->takeItem(listWidget->row(item));
+            // moveAddButtonToBottom(listWidget);  // Keep "Add Reference" button at the end
+        });
+
+        layout->addWidget(comboBox);
+        layout->addWidget(removeButton);
+        rowWidget->setLayout(layout);
+
+        // Always insert new item above the add button (second-to-last position)
+        int addButtonIndex = listWidget->count() - 1;
+        listWidget->insertItem(addButtonIndex, item);
+        listWidget->setItemWidget(item, rowWidget);
+
+        moveAddButtonToBottom(listWidget);  // Just to be extra safe
+    }
+
+    template<typename RefType>
+    void addAddButton(QListWidget* listWidget) {
+        auto* item = new QListWidgetItem(listWidget);
+        auto* addButton = new QPushButton("Add Reference", listWidget);
+        addButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        addButton->setStyleSheet("font-size: 12px;");
+
+        connect(addButton, &QPushButton::clicked, this, [=]() {
+            addReferenceItem<RefType>(listWidget);
+        });
+
+        listWidget->addItem(item);
+        listWidget->setItemWidget(item, addButton);
+    }
+
+    void moveAddButtonToBottom(QListWidget* listWidget) {
+        if (listWidget->count() == 0) return;
+
+        QListWidgetItem* addButtonItem = listWidget->takeItem(listWidget->count() - 1);
+        listWidget->addItem(addButtonItem);
+        listWidget->setItemWidget(addButtonItem, listWidget->itemWidget(addButtonItem));
     }
 };
 
