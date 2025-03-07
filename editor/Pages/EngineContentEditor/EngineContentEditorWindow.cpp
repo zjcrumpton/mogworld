@@ -1,5 +1,7 @@
 #include "Pages/EngineContentEditor/EngineContentEditorWindow.hpp"
 #include "Shared/WindowUtils.hpp"
+#include "Editors/TraitEditorWindow.hpp"
+#include "Editors/MaterialEditorWindow.hpp"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -23,13 +25,16 @@ EngineContentEditorWindow::EngineContentEditorWindow(QWidget* main_menu, QWidget
     title_label->setStyleSheet("font-size: 40px; font-weight: bold;");
 
     auto *edit_traits_button = new QPushButton("Edit Traits", this);
+    auto *edit_materials_button = new QPushButton("Edit Materials", this);
     auto *back_button = new QPushButton("Back to Main Menu", this);
 
     edit_traits_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    edit_materials_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     back_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
     layout->addWidget(title_label);
     layout->addWidget(edit_traits_button);
+    layout->addWidget(edit_materials_button);
     layout->addWidget(back_button);
 
     layout->setContentsMargins(20, 20, 20, 20);
@@ -38,6 +43,7 @@ EngineContentEditorWindow::EngineContentEditorWindow(QWidget* main_menu, QWidget
     central_widget->setLayout(layout);
 
     connect(edit_traits_button, &QPushButton::clicked, this, &EngineContentEditorWindow::on_edit_traits_clicked);
+    connect(edit_materials_button, &QPushButton::clicked, this, &EngineContentEditorWindow::on_edit_materials_clicked);
     connect(back_button, &QPushButton::clicked, this, &EngineContentEditorWindow::on_back_to_main_menu_clicked);
 }
 
@@ -48,6 +54,16 @@ void EngineContentEditorWindow::on_edit_traits_clicked() {
 
     center_on_parent(trait_editor_window, this);
     trait_editor_window->show();
+    this->hide();
+}
+
+void EngineContentEditorWindow::on_edit_materials_clicked() {
+    if (!material_editor_window) {
+        material_editor_window = new MaterialEditorWindow("Material Editor", this);
+    }
+
+    center_on_parent(material_editor_window, this);
+    material_editor_window->show();
     this->hide();
 }
 

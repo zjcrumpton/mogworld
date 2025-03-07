@@ -1,5 +1,9 @@
 [
     {
+        "description": "Conducts electricity.",
+        "name": "conductive"
+    },
+    {
         "description": "Entities slide when they move across this surface and could even slip and fall.",
         "name": "slippery"
     },

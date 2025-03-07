@@ -4,14 +4,15 @@
 #include <string>
 #include <vector>
 #include "Core/World/Trait.hpp"
-#include "nlohmann/json.hpp"
+#include "Macros/ReflectionMacro.hpp"
+#include "Core/Registries/TraitRegistry.hpp"
 
 struct Material {
     std::string name;
     std::string description;
-    std::vector<Trait> traits;
-   
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Material, name, description, traits)
+    std::vector<TraitReference> traits;
+ 
+    REFLECT(Material, name, description, traits)
 };
 
 #endif // MATERIAL_HPP

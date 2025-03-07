@@ -2,7 +2,6 @@
 #define TRAIT_HPP
 
 #include <string>
-#include <nlohmann/json.hpp>
 #include "Macros/ReflectionMacro.hpp"
 
 struct Trait {
